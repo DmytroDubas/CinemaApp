@@ -25,6 +25,19 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <!-- Добавили ссылки на наши страницы -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Films" asp-action="Index">Фільми</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Halls" asp-action="Index">Зали</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Sessions" asp-action="Index">Сеанси</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Tickets" asp-action="Index">Квитки</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -35,7 +48,6 @@
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2026 - CinemaApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
