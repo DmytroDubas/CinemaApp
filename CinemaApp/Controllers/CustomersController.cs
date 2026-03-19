@@ -9,23 +9,22 @@ using CinemaApp.Models;
 
 namespace CinemaApp.Controllers
 {
-    public class TicketsController : Controller
+    public class CustomersController : Controller
     {
         private readonly CinemaContext _context;
 
-        public TicketsController(CinemaContext context)
+        public CustomersController(CinemaContext context)
         {
             _context = context;
         }
 
-        // GET: Tickets
+        // GET: Customers
         public async Task<IActionResult> Index()
         {
-            var cinemaContext = _context.Tickets.Include(t => t.Customer).Include(t => t.Session);
-            return View(await cinemaContext.ToListAsync());
+            return View(await _context.Customers.ToListAsync());
         }
 
-        // GET: Tickets/Details/5
+        // GET: Customers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,45 +32,39 @@ namespace CinemaApp.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
-                .Include(t => t.Customer)
-                .Include(t => t.Session)
+            var customer = await _context.Customers
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            return View(ticket);
+            return View(customer);
         }
 
-        // GET: Tickets/Create
+        // GET: Customers/Create
         public IActionResult Create()
         {
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Id");
-            ViewData["Sessionid"] = new SelectList(_context.Sessions, "Id", "Id");
             return View();
         }
 
-        // POST: Tickets/Create
+        // POST: Customers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Sessionid,Seatnumber,Customerid")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,Name,Email")] Customer customer)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(ticket);
+                _context.Add(customer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Id", ticket.Customerid);
-            ViewData["Sessionid"] = new SelectList(_context.Sessions, "Id", "Id", ticket.Sessionid);
-            return View(ticket);
+            return View(customer);
         }
 
-        // GET: Tickets/Edit/5
+        // GET: Customers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,24 +72,22 @@ namespace CinemaApp.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null)
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer == null)
             {
                 return NotFound();
             }
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Id", ticket.Customerid);
-            ViewData["Sessionid"] = new SelectList(_context.Sessions, "Id", "Id", ticket.Sessionid);
-            return View(ticket);
+            return View(customer);
         }
 
-        // POST: Tickets/Edit/5
+        // POST: Customers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Sessionid,Seatnumber,Customerid")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email")] Customer customer)
         {
-            if (id != ticket.Id)
+            if (id != customer.Id)
             {
                 return NotFound();
             }
@@ -105,12 +96,12 @@ namespace CinemaApp.Controllers
             {
                 try
                 {
-                    _context.Update(ticket);
+                    _context.Update(customer);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TicketExists(ticket.Id))
+                    if (!CustomerExists(customer.Id))
                     {
                         return NotFound();
                     }
@@ -121,12 +112,10 @@ namespace CinemaApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Id", ticket.Customerid);
-            ViewData["Sessionid"] = new SelectList(_context.Sessions, "Id", "Id", ticket.Sessionid);
-            return View(ticket);
+            return View(customer);
         }
 
-        // GET: Tickets/Delete/5
+        // GET: Customers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -134,36 +123,34 @@ namespace CinemaApp.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
-                .Include(t => t.Customer)
-                .Include(t => t.Session)
+            var customer = await _context.Customers
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            return View(ticket);
+            return View(customer);
         }
 
-        // POST: Tickets/Delete/5
+        // POST: Customers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
-            if (ticket != null)
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer != null)
             {
-                _context.Tickets.Remove(ticket);
+                _context.Customers.Remove(customer);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TicketExists(int id)
+        private bool CustomerExists(int id)
         {
-            return _context.Tickets.Any(e => e.Id == id);
+            return _context.Customers.Any(e => e.Id == id);
         }
     }
 }

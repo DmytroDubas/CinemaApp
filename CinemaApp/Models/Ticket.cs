@@ -11,9 +11,9 @@ public partial class Ticket
 
     public int? Seatnumber { get; set; }
 
-    public string? Customername { get; set; }
+    public int? Customerid { get; set; }
 
-    public string? Customeremail { get; set; }
+    public virtual Customer? Customer { get; set; }
 
     public virtual Session? Session { get; set; }
 }

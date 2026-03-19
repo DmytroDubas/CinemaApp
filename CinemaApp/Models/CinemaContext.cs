@@ -15,6 +15,8 @@ public partial class CinemaContext : DbContext
     {
     }
 
+    public virtual DbSet<Customer> Customers { get; set; }
+
     public virtual DbSet<Film> Films { get; set; }
 
     public virtual DbSet<Hall> Halls { get; set; }
@@ -25,10 +27,25 @@ public partial class CinemaContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=cinema;Username=postgres;Password=postgres");
+        => optionsBuilder.UseNpgsql("Host=localhost;Database=cinema;Username=postgres;Password=postgres");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Customer>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("customers_pkey");
+
+            entity.ToTable("customers");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .HasColumnName("email");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name");
+        });
+
         modelBuilder.Entity<Film>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("films_pkey");
@@ -91,14 +108,13 @@ public partial class CinemaContext : DbContext
             entity.ToTable("tickets");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Customeremail)
-                .HasMaxLength(200)
-                .HasColumnName("customeremail");
-            entity.Property(e => e.Customername)
-                .HasMaxLength(200)
-                .HasColumnName("customername");
+            entity.Property(e => e.Customerid).HasColumnName("customerid");
             entity.Property(e => e.Seatnumber).HasColumnName("seatnumber");
             entity.Property(e => e.Sessionid).HasColumnName("sessionid");
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.Customerid)
+                .HasConstraintName("tickets_customerid_fkey");
 
             entity.HasOne(d => d.Session).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.Sessionid)
