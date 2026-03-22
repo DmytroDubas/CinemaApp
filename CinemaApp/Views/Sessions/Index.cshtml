@@ -1,53 +1,89 @@
 @model IEnumerable<CinemaApp.Models.Session>
 
-@{
+    @{
     ViewData["Title"] = "Index";
-}
+    }
 
-<h1>Index</h1>
+    <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Datetime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Film)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Hall)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Datetime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Film.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Hall.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Datetime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Film)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Hall)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Datetime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Film.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Hall.Id)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
 }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+
+    <div class="row mt-4">
+        <div class="col-6">
+            <div id="sessionsByHallChart"></div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function drawCharts() {
+        fetch('/api/charts/sessionsByHall')
+            .then(response => response.json())
+            .then(data => {
+                const dataTable = new google.visualization.DataTable();
+                dataTable.addColumn('string', 'Зал');
+                dataTable.addColumn('number', 'Кількість сеансів');
+                data.forEach(item => {
+                    dataTable.addRow([item.hall, item.count]);
+                });
+                const options = {
+                    title: 'Сеанси по залах',
+                    width: 600,
+                    height: 400,
+                    legend: { position: 'none' },
+                };
+                const chart = new google.visualization.ColumnChart(
+                    document.getElementById('sessionsByHallChart'));
+                chart.draw(dataTable, options);
+            });
+    }
+        </script>
+    }
